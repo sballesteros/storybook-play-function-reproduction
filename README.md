@@ -1,22 +1,8 @@
-# preact
+# Reproduction for https://github.com/storybookjs/storybook/issues/18697
 
-## CLI Commands
+Look at the `PlayFunctionBug` stories. Those stories use a simple counter as an example. The counter starts at 0 and clicking on the "increment" button increments the value.
 
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# test the production build locally
-npm run serve
-
-# run tests with jest and enzyme
-npm run test
-```
-
-For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+- The `Step With Bug` story shows an example with the bug. Here the storybook canvas shows the initial story state ("step: 0") instead of the state resulting from having run the `play` function (the play function emulates a user click on the increment button so the storybook canvas should be "step: 1" and not "step: 0"). The bug is due to the fact that we added a global decorator relying on the `useAddonState` API in `preview.js`. So:
+  - The `play` function work as expected
+  - But at the end, the story re-renders (without re-running the play function) and so the Storybook canvas reflects the story's initial state
+- The `Step With Workaround` story shows a workaround preventing the bug (delaying the play function execution until all the effects of the global decorator have been executed).
